@@ -1,0 +1,22 @@
+# Use on a VPS that already runs Traefik:
+#   docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
+#
+# Needs in .env: DOMAIN, TRAEFIK_NETWORK, TRAEFIK_CERTRESOLVER
+services:
+  web:
+    ports: !reset []
+    networks:
+      - default
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-traefik}
+      - traefik.http.routers.member-admin.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.member-admin.entrypoints=websecure
+      - traefik.http.routers.member-admin.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}
+      - traefik.http.services.member-admin.loadbalancer.server.port=80
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}

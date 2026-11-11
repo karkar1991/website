@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ma
+          POSTGRES_PASSWORD: ma
+          POSTGRES_DB: ma
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ma" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://ma:ma@localhost:5432/ma
+      ADMIN_PASSWORD: admin12345
+      PGPASSWORD: ma
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Load schema + fake data
+        run: |
+          for f in db/init/*.sql; do psql -h localhost -U ma -d ma -v ON_ERROR_STOP=1 -q -f "$f"; done
+      - name: Install
+        working-directory: backend
+        run: pip install -r requirements.txt pytest httpx
+      - name: Demo finance data
+        working-directory: backend
+        run: python -m app.seed_demo --deposits 1000 --withdrawals 200
+      - name: Tests
+        working-directory: backend
+        run: pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - working-directory: frontend
+        run: npm ci && npm run build

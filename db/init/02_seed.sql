@@ -18,9 +18,11 @@ FROM brands b, unnest(ARRAY['new', 'active', 'inactive', 'priority']) AS t;
 INSERT INTO admin_roles (name, permissions) VALUES
     ('super_admin', ARRAY['*']),
     ('marketing',   ARRAY['member.view', 'member.export']),
-    ('finance',     ARRAY['member.view', 'finance.view']);
+    ('finance',     ARRAY['member.view', 'finance.view', 'finance.create', 'finance.approve']),
+    ('support',     ARRAY['member.view', 'member.edit', 'finance.view']);
 
--- Demo admin. password_hash is a placeholder: replace with a real bcrypt hash.
+-- Demo admin. 'CHANGE_ME' is replaced by a bcrypt hash of ADMIN_PASSWORD
+-- when the API starts for the first time (see backend/app/main.py).
 INSERT INTO admin_users (username, password_hash, role_id, allowed_brands)
 SELECT 'admin', 'CHANGE_ME', r.id, ARRAY(SELECT id FROM brands)
 FROM admin_roles r WHERE r.name = 'super_admin';
@@ -94,4 +96,5 @@ FROM members m
 JOIN tags t ON t.brand_id = m.brand_id
 WHERE random() < 0.025;
 
-ANALYZE;
+ANALYZE members;
+ANALYZE member_tags;

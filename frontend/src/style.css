@@ -1,0 +1,10 @@
+html, body, #app { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Myanmar", sans-serif; }
+body { background: #f5f7fa; }
+.page { padding: 16px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.toolbar .spacer { flex: 1; }
+.card { background: #fff; border-radius: 6px; padding: 16px; }
+.pager { display: flex; justify-content: flex-end; margin-top: 12px; }
+.money { font-variant-numeric: tabular-nums; }
+.plus { color: #18a058; }
+.minus { color: #d03050; }
