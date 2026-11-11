@@ -2,8 +2,7 @@
   <div class="page">
     <div class="card">
       <div class="toolbar">
-        <el-date-picker v-model="f.dates" type="daterange" value-format="YYYY-MM-DD" start-placeholder="From"
-                        end-placeholder="To" style="width: 260px" />
+        <DateRange v-model="f.dates" @change="search" />
         <el-input v-model="f.username" placeholder="Member username" clearable style="width: 180px" @keyup.enter="search" />
         <el-select v-model="f.type" placeholder="Type" clearable style="width: 140px">
           <el-option v-for="t in ['deposit', 'withdraw', 'commission', 'adjust']" :key="t" :label="t" :value="t" />
@@ -34,6 +33,7 @@
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
+import DateRange from '../components/DateRange.vue'
 import { brandParam, dt, http, money, session } from '../api'
 
 const f = reactive({ dates: null, username: '', type: '' })

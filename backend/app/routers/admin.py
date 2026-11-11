@@ -21,6 +21,8 @@ class AdminPatch(BaseModel):
     role_id: int | None = None
     allowed_brands: list[int] | None = None
     is_active: bool | None = None
+    reset_2fa: bool = False   # admin lost their phone
+    unlock: bool = False      # clear failed-login lock
 
 
 def _check_brands(admin: Admin, brands: list[int]):
@@ -37,7 +39,8 @@ def roles(admin: Admin = Depends(require("admin.manage")), conn=Depends(get_conn
 @router.get("/users")
 def users(admin: Admin = Depends(require("admin.manage")), conn=Depends(get_conn)):
     return conn.execute(
-        """SELECT a.id, a.username, a.role_id, r.name AS role, a.allowed_brands, a.is_active, a.created_at
+        """SELECT a.id, a.username, a.role_id, r.name AS role, a.allowed_brands, a.is_active, a.created_at,
+                  a.totp_enabled, a.locked_until, a.last_login_at
            FROM admin_users a JOIN admin_roles r ON r.id = a.role_id ORDER BY a.id"""
     ).fetchall()
 
@@ -74,11 +77,15 @@ def update_user(user_id: int, body: AdminPatch, admin: Admin = Depends(require("
         changes["allowed_brands"] = body.allowed_brands
     if body.is_active is not None:
         changes["is_active"] = body.is_active
+    if body.reset_2fa:
+        changes.update(totp_enabled=False, totp_secret=None)
+    if body.unlock:
+        changes.update(failed_logins=0, locked_until=None)
     if changes:
         sets = ", ".join(f"{k} = %({k})s" for k in changes)
         conn.execute(f"UPDATE admin_users SET {sets} WHERE id = %(id)s", {**changes, "id": user_id})
     audit.log(conn, admin.id, "admin.update", user_id,
-              {k: v for k, v in body.model_dump(exclude_none=True).items() if k != "password"}
+              {k: v for k, v in body.model_dump(exclude_defaults=True).items() if k != "password"}
               | ({"password": "changed"} if body.password else {}))
     return {"id": user_id, "updated": list(changes)}
 

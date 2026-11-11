@@ -5,7 +5,7 @@ import { reactive } from 'vue'
 // ---------------- session store ----------------
 export const session = reactive({
   me: null,          // { id, username, role, permissions, allowed_brands }
-  options: { brands: [], vip_levels: [], tags: [], statuses: [] },
+  options: { brands: [], vip_levels: [], member_levels: [], sources: [], tags: [], statuses: [], account_types: [] },
   brandId: null      // global brand filter (null = all allowed brands)
 })
 
@@ -63,8 +63,9 @@ http.interceptors.response.use(
   }
 )
 
-export async function login(username, password) {
-  const { data } = await http.post('/auth/login', { username, password })
+export async function login(username, password, otp = null) {
+  // silent: the login page shows its own messages (and handles OTP_REQUIRED)
+  const { data } = await http.post('/auth/login', { username, password, otp }, { silent: true })
   tokens.set(data)
   await loadSession()
 }

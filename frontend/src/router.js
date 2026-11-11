@@ -10,6 +10,8 @@ const routes = [
     redirect: '/members',
     children: [
       { path: 'members', component: () => import('./views/Members.vue'), meta: { title: 'Members', perm: 'member.view' } },
+      { path: 'agents', component: () => import('./views/Agents.vue'), meta: { title: 'Agents', perm: 'member.view' } },
+      { path: 'sources', component: () => import('./views/Sources.vue'), meta: { title: 'Traffic sources', perm: 'member.view' } },
       { path: 'deposits', component: () => import('./views/Requests.vue'), props: { kind: 'deposits' }, meta: { title: 'Deposits', perm: 'finance.view' } },
       { path: 'withdrawals', component: () => import('./views/Requests.vue'), props: { kind: 'withdrawals' }, meta: { title: 'Withdrawals', perm: 'finance.view' } },
       { path: 'transactions', component: () => import('./views/Transactions.vue'), meta: { title: 'Ledger', perm: 'finance.view' } },

@@ -14,6 +14,11 @@ class Settings:
     cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
     # day boundaries for date filters and daily reports (Myanmar = Asia/Yangon, Thailand = Asia/Bangkok)
     timezone = os.getenv("APP_TIMEZONE", "Asia/Yangon")
+    telegram_bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    telegram_chat_id = os.getenv("TELEGRAM_CHAT_ID", "")
+    max_failed_logins = int(os.getenv("MAX_FAILED_LOGINS", "5"))
+    lock_minutes = int(os.getenv("LOCK_MINUTES", "15"))
+    totp_issuer = os.getenv("TOTP_ISSUER", "Member Admin")
     export_max_rows = int(os.getenv("EXPORT_MAX_ROWS", "100000"))
 
 

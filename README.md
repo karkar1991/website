@@ -10,16 +10,20 @@ Brand အများကြီးကို စနစ်တစ်ခုတည်�
 
 | Module | ဘာလုပ်လဲ |
 |---|---|
-| **Login** | JWT access token (၁၅ မိနစ်) + refresh token (၇ ရက်)၊ token ကုန်ရင် အလိုအလျောက် refresh လုပ်ပေးပါတယ် |
-| **Members** | ရှာဖွေခြင်း (ရက်စွဲ၊ username၊ inviter၊ VIP၊ tag)၊ status tab များ၊ member အသစ်ထည့်ခြင်း၊ bulk status ပြောင်းခြင်း၊ Excel export |
-| **Member detail** | Wallet balance၊ ledger၊ status/tag ပြောင်းခြင်း၊ balance ညှိခြင်း၊ referral tree (အဆင့်ဆင့် ဖွင့်ကြည့်နိုင်) |
-| **Deposits** | ငွေသွင်း request → Approve / Reject၊ channel အလိုက် min/max စစ်ခြင်း၊ approve ရင် agent commission အလိုအလျောက် ပေးခြင်း |
-| **Withdrawals** | Request တင်တာနဲ့ ငွေကို freeze လုပ်ခြင်း → Approve (transfer ID ထည့်ရ) / Reject (freeze ပြန်ဖြေ)၊ blacklist member ငွေထုတ်ခွင့် ပိတ်ခြင်း |
-| **Ledger** | ငွေလှုပ်ရှားမှုတိုင်း (deposit, withdraw, commission, adjust)၊ ဖျက်လို့ပြင်လို့ မရပါ |
-| **Payment channels** | KBZPay / WavePay / Bank account များ၊ ကန့်သတ်ပမာဏ၊ ဖွင့်/ပိတ် |
-| **Reports** | Brand အလိုက် summary + နေ့စဉ် ငွေဝင်/ထွက်/commission/new members |
-| **Admin users** | Admin account၊ role၊ ကြည့်ခွင့်ရှိတဲ့ brand သတ်မှတ်ခြင်း |
-| **Audit log** | ဘယ် admin က ဘာလုပ်ခဲ့လဲ (login, approve, status change, export …) |
+| **Login** | JWT access token (၁၅ မိနစ်) + refresh token (၇ ရက်)၊ **2FA** (Google Authenticator)၊ password ၅ ခါမှားရင် ၁၅ မိနစ် lock |
+| **Members** | All / Blacklist / Leaving / Left tab၊ **Today / Yesterday / Week / Month** ခလုတ်၊ username၊ ဖုန်း၊ inviter၊ VIP၊ member level၊ account type (formal/test)၊ traffic source၊ tag နဲ့ ရှာခြင်း၊ ⚙️ column ရွေးခြင်း၊ member ထည့်ခြင်း၊ **Excel/CSV import**၊ bulk status၊ Excel export |
+| **Member detail** | Wallet + ledger၊ balance ညှိခြင်း၊ referral tree (100 ယောက်စီ "Load more")၊ profile / VIP / level / source / status / tag ပြင်ခြင်း |
+| **Agents** | Invite လုပ်ထားတဲ့ member အားလုံး: တိုက်ရိုက် invite၊ team တစ်ခုလုံး၊ ကာလအတွင်း member အသစ်၊ team ငွေသွင်း၊ commission — အစီအစဉ်ပြောင်းကြည့်လို့ရ |
+| **Deposits** | ငွေသွင်း request → Approve / Reject၊ channel min/max စစ်ခြင်း၊ approve ရင် agent commission အလိုအလျောက် |
+| **Withdrawals** | Request တင်တာနဲ့ ငွေ freeze → Approve (transfer ID ထည့်ရ) / Reject၊ blacklist member ငွေထုတ်ခွင့် ပိတ် |
+| **Notifications** | 🔔 Pending request အရေအတွက် (၁၅ စက္ကန့်တစ်ခါ စစ်)၊ အသစ်ဝင်ရင် popup + အသံ၊ **Telegram group** ထဲ alert (optional) |
+| **Ledger** | ငွေလှုပ်ရှားမှုတိုင်း (deposit, withdraw, commission, adjust) — ဖျက်/ပြင်လို့ မရ |
+| **Payment channels** | KBZPay / WavePay / Bank account၊ ကန့်သတ်ပမာဏ၊ ဖွင့်/ပိတ် |
+| **Traffic sources** | Member ဘယ်ကလာလဲ (Facebook ads, TikTok, telesale, referral link …) |
+| **Reports** | Brand summary၊ နေ့စဉ်၊ **source အလိုက် conversion**၊ test account တွေကို default ဖယ်ထား |
+| **Admin users** | Account၊ role၊ brand ခွင့်ပြုချက်၊ 2FA အခြေအနေ၊ last login၊ Unlock / Reset 2FA |
+| **Audit log** | ဘယ် admin က ဘာလုပ်ခဲ့လဲ (login, login မှား, approve, import, export, ပြင်ဆင်မှု …) |
+| **Backup** | `scripts/backup.sh` (နေ့စဉ်၊ ၁၄ ရက်စာ သိမ်း) + `scripts/restore.sh` |
 
 ### Roles
 
@@ -27,10 +31,27 @@ Brand အများကြီးကို စနစ်တစ်ခုတည်�
 |---|---|
 | `super_admin` | အကုန်လုံး |
 | `finance` | Member ကြည့်၊ deposit/withdraw ဖန်တီး + approve |
-| `marketing` | Member ကြည့်၊ export |
+| `marketing` | Member ကြည့်၊ export၊ traffic source စီမံ |
 | `support` | Member ကြည့်/ပြင်၊ finance ကြည့်ရုံ |
 
 Admin တစ်ယောက်ချင်းစီဟာ `allowed_brands` ထဲက brand data ကိုပဲ မြင်ရပါတယ်။
+
+### WG backend နဲ့ နှိုင်းယှဉ်ချက်
+
+| WG | ဒီ system |
+|---|---|
+| 所有会员 / 黑名单 / 劝退中 / 已劝退 | Members tabs: All / Blacklist / Leaving / Left |
+| 注册时间 + 日 / 周 / 月 | Registered date + Today / Yesterday / Week / Month |
+| 精准会员账号 / 高级搜索 | Exact username + "More filters" |
+| 新增会员 / 导入 / 导出报表 | Add member / Import / Export |
+| 账号类型 (正式账号) | Account type (formal / test) |
+| 会员层级 / VIP | Member level / VIP |
+| 邀请人 / 顶层代理 / 上级代理 | Inviter / Top agent / referral tree |
+| 代理 | Agents page |
+| 引流 | Traffic sources + source report |
+| 消息 | 🔔 notifications + Telegram |
+| ⚙️ column settings | ⚙️ column chooser |
+| 批量操作 | Bulk action |
 
 ## Stack
 
@@ -38,7 +59,8 @@ PostgreSQL 16 · FastAPI (Python) · Vue 3 + Element Plus · Docker Compose · T
 
 ```
 .
-├── db/init/            # SQL: schema, fake members, finance tables (first start only)
+├── db/init/            # SQL: schema, fake members, finance, extra fields (first start only)
+├── scripts/            # backup.sh, restore.sh
 ├── backend/            # FastAPI API  (app/routers, app/services/wallet.py, tests/)
 ├── frontend/           # Vue 3 admin UI (src/views)
 ├── docker-compose.yml
@@ -77,11 +99,26 @@ docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
 ```
 
 **4. Login ဝင်ပါ** — username `admin`၊ password က `.env` ထဲက `ADMIN_PASSWORD` ဖြစ်ပါတယ်။
+ဝင်ပြီးတာနဲ့ ညာဘက်အပေါ် နာမည် → **Two-factor login (2FA)** ကို ဖွင့်ပါ (ငွေကိုင်တဲ့ admin အားလုံး ဖွင့်သင့်ပါတယ်)။
 
 **5. (Optional) Demo ငွေသွင်း/ထုတ် data ထည့်ပါ**
 ```bash
 docker compose exec api python -m app.seed_demo --deposits 3000 --withdrawals 600
 ```
+
+**6. နေ့စဉ် backup ဖွင့်ပါ**
+```bash
+chmod +x scripts/*.sh
+./scripts/backup.sh                       # တစ်ခါ စမ်း run ကြည့်ပါ
+crontab -e                                # ပြီးရင် ဒီစာကြောင်း ထည့်ပါ (မနက် ၃:၃၀ တိုင်း)
+30 3 * * * /root/member-admin/scripts/backup.sh >> /var/log/member-admin-backup.log 2>&1
+```
+Backup ကို VPS တစ်ခုတည်းမှာပဲ မထားပါနဲ့၊ တခြားနေရာ (Google Drive, another server) ကို ကူးထားပါ။
+ပြန်ထည့်ရန်: `./scripts/restore.sh backups/member_admin_YYYYMMDD_HHMMSS.sql.gz`
+
+**7. (Optional) Telegram alert** — @BotFather မှာ bot လုပ်ပြီး finance group ထဲ ထည့်ပါ။ `.env` ထဲ `TELEGRAM_BOT_TOKEN` နဲ့ `TELEGRAM_CHAT_ID` ထည့်ပြီး `docker compose up -d` ပြန် run ပါ။
+
+**အချိန်ဇုန်** — `APP_TIMEZONE` (default `Asia/Yangon`) က "ဒီနေ့"၊ နေ့စဉ် report တွေရဲ့ နေ့ပိုင်းခြားချက်ကို ဆုံးဖြတ်ပါတယ်။ ထိုင်းအချိန်လိုရင် `Asia/Bangkok`။
 
 ပထမဆုံးအကြိမ် start လုပ်တဲ့အခါ fake member ၁ သိန်းကို ထည့်ပေးတာကြောင့် ၁ မိနစ်လောက် ကြာနိုင်ပါတယ်။
 Database ကို အစကနေ ပြန်စချင်ရင်: `docker compose down -v && docker compose up -d --build`
@@ -121,6 +158,7 @@ GitHub ပေါ် push လုပ်တိုင်း `.github/workflows/ci.ym
 - ငွေနဲ့ဆိုင်တဲ့ logic အားလုံးဟာ `backend/app/services/wallet.py` ထဲမှာပဲ ရှိပါတယ်။
 
 ## Security
+- Admin login: bcrypt password + 2FA (TOTP) + failed-login lock + audit log
 
 - `.env` ကို GitHub ပေါ် **ဘယ်တော့မှ မတင်ပါနဲ့** (`.gitignore` ထဲ ထည့်ပြီးသား)
 - Customer data အစစ်၊ export file (`.xlsx`, `.csv`)၊ DB dump တွေ မတင်ပါနဲ့

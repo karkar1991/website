@@ -10,10 +10,22 @@
         <el-table-column prop="username" label="Username" />
         <el-table-column prop="role" label="Role" width="140" />
         <el-table-column label="Brands"><template #default="{ row }">{{ row.allowed_brands.map(brandName).join(', ') }}</template></el-table-column>
-        <el-table-column label="Active" width="90">
+        <el-table-column label="2FA" width="80">
+          <template #default="{ row }"><el-tag size="small" :type="row.totp_enabled ? 'success' : 'warning'">{{ row.totp_enabled ? 'ON' : 'OFF' }}</el-tag></template>
+        </el-table-column>
+        <el-table-column label="Last login" width="170"><template #default="{ row }">{{ dt(row.last_login_at) }}</template></el-table-column>
+        <el-table-column label="Active" width="80">
           <template #default="{ row }"><el-switch :model-value="row.is_active" @change="(v) => patch(row.id, { is_active: v })" /></template>
         </el-table-column>
-        <el-table-column label="" width="90"><template #default="{ row }"><el-button size="small" @click="edit(row)">Edit</el-button></template></el-table-column>
+        <el-table-column label="" width="250">
+          <template #default="{ row }">
+            <el-button size="small" @click="edit(row)">Edit</el-button>
+            <el-button v-if="isLocked(row)" size="small" type="warning" @click="patch(row.id, { unlock: true })">Unlock</el-button>
+            <el-popconfirm v-if="row.totp_enabled" title="Turn off 2FA for this admin (lost phone)?" @confirm="patch(row.id, { reset_2fa: true })">
+              <template #reference><el-button size="small" type="danger" plain>Reset 2FA</el-button></template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
@@ -49,13 +61,14 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { http, session } from '../api'
+import { dt, http, session } from '../api'
 
 const rows = ref([])
 const roles = ref([])
 const loading = ref(false)
 const open = ref(false)
 const form = reactive({})
+const isLocked = (row) => row.locked_until && new Date(row.locked_until) > new Date()
 const brandName = (id) => session.options.brands.find((b) => b.id === id)?.name || `#${id}`
 
 async function load() {

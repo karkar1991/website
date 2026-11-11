@@ -8,8 +8,7 @@
         <el-tab-pane label="All" name="" />
       </el-tabs>
       <div class="toolbar">
-        <el-date-picker v-model="f.dates" type="daterange" value-format="YYYY-MM-DD" start-placeholder="From"
-                        end-placeholder="To" style="width: 260px" />
+        <DateRange v-model="f.dates" @change="search" />
         <el-input v-model="f.username" placeholder="Member username" clearable style="width: 180px" @keyup.enter="search" />
         <el-button type="primary" icon="Search" @click="search">Search</el-button>
         <div class="spacer" />
@@ -99,6 +98,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import DateRange from '../components/DateRange.vue'
 import { brandParam, can, dt, http, money, session, statusTag } from '../api'
 
 const props = defineProps({ kind: { type: String, required: true } }) // deposits | withdrawals

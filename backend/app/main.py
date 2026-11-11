@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import db
 from .config import settings
-from .routers import admin, auth, finance, members, options, reports
+from .routers import admin, agents, auth, finance, members, notifications, options, reports
 from .security import hash_password
 
 log = logging.getLogger("member_admin")
@@ -42,7 +42,7 @@ if settings.cors_origins:
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=True,
                        allow_methods=["*"], allow_headers=["*"])
 
-for r in (auth, options, members, finance, reports, admin):
+for r in (auth, options, members, agents, finance, reports, notifications, admin):
     app.include_router(r.router)
 
 

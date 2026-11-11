@@ -3,13 +3,13 @@ from datetime import date, timedelta
 from decimal import Decimal
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from .. import audit
 from ..db import get_conn
 from ..deps import Admin, brand_scope, paging, require
-from ..services import wallet
+from ..services import notify, wallet
 from ..services.wallet import WalletError
 from .members import get_member
 
@@ -183,10 +183,13 @@ def create_deposit_request(conn, admin_id: int | None, member: dict, body: Depos
 
 
 @router.post("/deposits", status_code=201)
-def create_deposit(body: DepositIn, admin: Admin = Depends(require("finance.create")), conn=Depends(get_conn)):
+def create_deposit(body: DepositIn, bg: BackgroundTasks, admin: Admin = Depends(require("finance.create")),
+                   conn=Depends(get_conn)):
     member = get_member(conn, admin, body.member_id)
     row = create_deposit_request(conn, admin.id, member, body)
     audit.log(conn, admin.id, "deposit.create", row["id"], body.model_dump(mode="json"))
+    bg.add_task(notify.send, f"🟢 <b>New deposit #{row['id']}</b>\nMember: {member['username']}\n"
+                             f"Amount: {notify.money(row['amount'])}\nBy: {admin.username}")
     return row
 
 
@@ -263,10 +266,14 @@ def create_withdraw_request(conn, admin_id: int | None, member: dict, body: With
 
 
 @router.post("/withdrawals", status_code=201)
-def create_withdraw(body: WithdrawIn, admin: Admin = Depends(require("finance.create")), conn=Depends(get_conn)):
+def create_withdraw(body: WithdrawIn, bg: BackgroundTasks, admin: Admin = Depends(require("finance.create")),
+                    conn=Depends(get_conn)):
     member = get_member(conn, admin, body.member_id)
     row = create_withdraw_request(conn, admin.id, member, body)
     audit.log(conn, admin.id, "withdraw.create", row["id"], body.model_dump(mode="json"))
+    bg.add_task(notify.send, f"🔴 <b>New withdrawal #{row['id']}</b>\nMember: {member['username']}\n"
+                             f"Amount: {notify.money(row['amount'])}\nTo: {row['receive_method']} "
+                             f"{row['receive_account']}\nBy: {admin.username}")
     return row
 
 
