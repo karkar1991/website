@@ -21,7 +21,7 @@ def main() -> None:
     args = ap.parse_args()
     rnd = random.Random(args.seed)
 
-    db.init_pool(settings.database_url)
+    db.init_pool(settings.database_url, settings.timezone)
     with db.pool.connection() as conn:
         admin_id = conn.execute("SELECT id FROM admin_users ORDER BY id LIMIT 1").fetchone()["id"]
         channels = {}

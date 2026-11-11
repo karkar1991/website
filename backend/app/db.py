@@ -4,9 +4,10 @@ from psycopg_pool import ConnectionPool
 pool: ConnectionPool | None = None
 
 
-def init_pool(url: str) -> ConnectionPool:
+def init_pool(url: str, timezone: str = "UTC") -> ConnectionPool:
     global pool
-    pool = ConnectionPool(url, min_size=1, max_size=10, kwargs={"row_factory": dict_row}, open=True)
+    pool = ConnectionPool(url, min_size=1, max_size=10, open=True,
+                          kwargs={"row_factory": dict_row, "options": f"-c timezone={timezone}"})
     return pool
 
 

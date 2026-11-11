@@ -12,6 +12,8 @@ class Settings:
     admin_username = os.getenv("ADMIN_USERNAME", "admin")
     admin_password = os.getenv("ADMIN_PASSWORD", "")
     cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
+    # day boundaries for date filters and daily reports (Myanmar = Asia/Yangon, Thailand = Asia/Bangkok)
+    timezone = os.getenv("APP_TIMEZONE", "Asia/Yangon")
     export_max_rows = int(os.getenv("EXPORT_MAX_ROWS", "100000"))
 
 

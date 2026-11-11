@@ -29,7 +29,7 @@ def bootstrap_admin() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if db.pool is None:
-        db.init_pool(settings.database_url)
+        db.init_pool(settings.database_url, settings.timezone)
     bootstrap_admin()
     yield
     db.close_pool()
